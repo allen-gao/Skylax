@@ -4,7 +4,7 @@
  */
 
 var express = require('express'),
-  //bodyParser = require('body-parser'),
+  bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
   errorHandler = require('express-error-handler'),
   morgan = require('morgan'),
@@ -25,6 +25,9 @@ var app = module.exports = express();
 app.set('port', process.env.PORT || 3000);
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
+app.use(bodyParser());
+app.use(methodOverride());
+//app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 var env = process.env.NODE_ENV || 'development';
@@ -54,6 +57,20 @@ app.get('/api/name', api.name);
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
 
+app.post('/planets', function(req, res) {
+  console.log(req.body);
+
+  var options = {
+    url: 'http://omniweb.gsfc.nasa.gov/cgi/models/planet.cgi',
+    method: 'POST',
+    formData: req.body
+  };
+  var callback = function(response1, response2) {
+    return res.send(response2);
+  }
+  request(options, callback);
+});
+
 
 /**
  * Start Server
@@ -62,24 +79,4 @@ app.get('*', routes.index);
 http.createServer(app).listen(app.get('port'), function () {
   console.log('Express server listening on port ' + app.get('port'));
 
-  var options = {
-    url: 'http://omniweb.gsfc.nasa.gov/cgi/models/planet.cgi',
-    method: 'POST',
-    formData: {
-      'activity': 'retrieve',
-      'planet': '07',
-      'coordinate': '2',
-      'resolution': '001',
-      'start_year': '1998',
-      'start_day': '001',
-      'stop_year': '1998',
-      'stop_day': '365',
-    }
-  };
-  var callback = function(response, err) {
-      //console.log(err);
-      //console.log(response);
-  }
-
-  request(options, callback);
 })

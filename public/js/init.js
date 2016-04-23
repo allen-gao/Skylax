@@ -14,3 +14,20 @@ function init() {
   createjs.Ticker.setFPS(60);
   createjs.Ticker.addEventListener("tick", stage);
 }
+
+$.ajax({
+  type: 'POST',
+  url: '/planets',
+  data: {
+    'activity': 'retrieve',
+    'planet': '07',
+    'coordinate': '2',
+    'resolution': '001',
+    'start_year': '1998',
+    'start_day': '001',
+    'stop_year': '1998',
+    'stop_day': '365',
+  }
+}).done(function(response) {
+  console.log(response.body);
+})
