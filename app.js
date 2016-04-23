@@ -1,46 +1,82 @@
-function init() {
-  var stage = new createjs.Stage("demoCanvas");
-  var circle = new createjs.Shape();
-  circle.graphics.beginFill("Crimson").drawCircle(0, 0, 50);
-  circle.x = 100;
-  circle.y = 100;
-  stage.addChild(circle);
-  createjs.Tween.get(circle, {loop: true})
-    .to({x: 400}, 1000, createjs.Ease.getPowInOut(4))
-    .to({alpha: 0, y: 75}, 500, createjs.Ease.getPowInOut(2))
-    .to({alpha: 0, y: 125}, 100)
-    .to({alpha: 1, y: 100}, 500, createjs.Ease.getPowInOut(2))
-    .to({x: 100}, 800, createjs.Ease.getPowInOut(2));
-  createjs.Ticker.setFPS(60);
-  createjs.Ticker.addEventListener("tick", stage);
-  console.log(convertXY(100, 100));
 
-  document.domain = 'omniweb.gsfc.nasa.gov';
+/**
+ * Module dependencies
+ */
 
-  $.ajax({
-  url: 'http://omniweb.gsfc.nasa.gov/cgi/models/planet.cgi',
-  data: {
-    'activity': 'retrieve',
-    'planet': '07',
-    'coordinate': '2',
-    'resolution': '001',
-start_year: '1998',
-start_day:'001',
-stop_year:'2013',
-stop_day:'365'
-  },
-  success: function(data){
-    console.log(data);
-  }
-});
+var express = require('express'),
+  bodyParser = require('body-parser'),
+  methodOverride = require('method-override'),
+  errorHandler = require('express-error-handler'),
+  morgan = require('morgan'),
+  routes = require('./routes'),
+  api = require('./routes/api'),
+  http = require('http'),
+  path = require('path'),
+  request = require('request');
+
+var app = module.exports = express();
+
+
+/**
+ * Configuration
+ */
+
+// all environments
+app.set('port', process.env.PORT || 3000);
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+app.use(bodyParser());
+app.use(methodOverride());
+//app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+var env = process.env.NODE_ENV || 'development';
+
+// development only
+if (env === 'development') {
+  app.use(errorHandler());
 }
 
-function convertXY(long, lat) {
-  var radius = 100;
-  var x = radius * Math.cos(lat) * Math.cos(long);
-  var y = radius * Math.cos(lat) * Math.sin(long);
-  return {
-    x: x,
-    y: y
+// production only
+if (env === 'production') {
+  // TODO
+}
+
+
+/**
+ * Routes
+ */
+
+// serve index and view partials
+app.get('/', routes.index);
+app.get('/partials/:name', routes.partials);
+
+// JSON API
+app.get('/api/name', api.name);
+
+// redirect all others to the index (HTML5 history)
+app.get('*', routes.index);
+
+app.post('/planets', function(req, res) {
+  console.log(req.body);
+
+  var options = {
+    url: 'http://omniweb.gsfc.nasa.gov/cgi/models/planet.cgi',
+    method: 'POST',
+    formData: req.body
   };
-}
+  var callback = function(response1, response2) {
+    return res.send(response2);
+  }
+  request(options, callback);
+});
+
+
+/**
+ * Start Server
+ */
+
+http.createServer(app).listen(app.get('port'), function () {
+  console.log('Express server listening on port ' + app.get('port'));
+
+})
