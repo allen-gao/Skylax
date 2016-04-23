@@ -41,7 +41,6 @@ function parser(body) {
   lines = lines.map(function(line) {
     return line.split(/[\s,]+/);
   });
-  console.dir(lines);
   lines.forEach(function(line) {
     if (line.length > 1 && line[0] !== 'start_year=') {
       var num = Number(line[1]);
@@ -52,4 +51,14 @@ function parser(body) {
     }
   });
   return responseArray;
+}
+
+function convertXY(long, lat) {
+  var radius = 100;
+  var x = radius * Math.cos(lat) * Math.cos(long);
+  var y = radius * Math.cos(lat) * Math.sin(long);
+  return {
+    x: x,
+    y: y
+  };
 }
