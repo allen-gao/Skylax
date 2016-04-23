@@ -1,3 +1,6 @@
+var minYear = 1950;
+var maxYear = 2030;
+
 function init() {
   var stage = new createjs.Stage("demoCanvas");
   var circle = new createjs.Shape();
@@ -29,5 +32,24 @@ $.ajax({
     'stop_day': '365',
   }
 }).done(function(response) {
-  console.log(response.body);
+  console.log(parser(response.body));
 })
+
+function parser(body) {
+  var responseArray = [];
+  var lines = body.split('\n');
+  lines = lines.map(function(line) {
+    return line.split(/[\s,]+/);
+  });
+  console.dir(lines);
+  lines.forEach(function(line) {
+    if (line.length > 1 && line[0] !== 'start_year=') {
+      var num = Number(line[1]);
+      if (num !== NaN && num >= minYear && num <= maxYear) {
+        line.shift();
+        responseArray.push(line);
+      }
+    }
+  });
+  return responseArray;
+}
