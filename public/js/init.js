@@ -42,7 +42,7 @@ function init() {
   stage.addChild(sunCircle);
   // earth
   var earthImage = new Image();
-  earthImage.src = 'http://vignette1.wikia.nocookie.net/xenosaga/images/1/1e/Earth.png/revision/20141111161920';
+  earthImage.src = 'http://vignette1.wikia.nocookie.net/xenosaga/images/1/1e/Earth.png';
   earthCircle = new createjs.Bitmap(earthImage);
   earthCircle.scaleX = earthCircle.scaleY = 0.10;
   stage.addChild(earthCircle);
