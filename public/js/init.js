@@ -8,6 +8,8 @@ var sf = 10000;
 
 var planetsData = [];
 
+var interval;
+
 
 var urls = [
   'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_9034.lst', // mercury 2000 001 - 2015 365
@@ -71,14 +73,64 @@ function init() {
     })
     */
   });
+
+  var interval;
   $(function() {
+
+    function start() {
+      if (!interval) {
+        interval = setInterval(function(){ myTimer() }, 100);
+      }
+    }
+
+    function myTimer() {
+      var oldValue = $('#slider').slider("option", "value");
+      var value = oldValue + 1;
+      $("#slider").slider('value', value);
+
+      var years = Math.floor(value / 365);
+      var days = value % 365;
+      $( "#currentTime" ).val( "year: " + (years + 1996) + " days: " + days );
+      var earthArray = planetData[0][value];
+      if (earthArray) {
+        earthCircle.x = negSqrt(Number(earthArray[0]*sf)) + xOffset;
+        earthCircle.y = negSqrt(Number(earthArray[1]*sf)) + yOffset;
+      }
+      var mercuryArray = planetData[1][value];
+      if (mercuryArray) {
+        mercuryCircle.x = negSqrt(Number(mercuryArray[0]*sf)) + xOffset;
+        mercuryCircle.y = negSqrt(Number(mercuryArray[1]*sf)) + yOffset;
+      }
+      var saturnArray = planetData[2][value];
+      if (saturnArray) {
+        saturnCircle.x = negSqrt(Number(saturnArray[0]*sf)) + xOffset;
+        saturnCircle.y = negSqrt(Number(saturnArray[1]*sf)) + yOffset;
+      }
+      var jupiterArray = planetData[3][value];
+      if (jupiterArray) {
+        jupiterCircle.x = negSqrt(Number(jupiterArray[0]*sf)) + xOffset;
+        jupiterCircle.y = negSqrt(Number(jupiterArray[1]*sf)) + yOffset;
+      }
+    }
+    function stop() {
+      clearInterval(interval);
+      interval = null;
+    }
+    $('#startButton').click(function() {
+      start();
+    });
+    $('#stopButton').click(function() {
+      stop();
+    });
+
     $('#slider').slider({
       min: 1460,
       max: 7300, // days after 1996 001
+      value: 1460,
       slide: function( event, ui ) {
-        var days = ui.value;
-        var years = Math.floor(days / 365);
-        var days = days % 365;
+        var value = ui.value;
+        var years = Math.floor(value / 365);
+        var days = value % 365;
         $( "#currentTime" ).val( "year: " + (years + 1996) + " days: " + days );
         var earthArray = planetData[0][ui.value];
         if (earthArray) {
