@@ -4,7 +4,7 @@ var maxYear = 2030;
 var xOffset = 400;
 var yOffset = 400;
 
-var sf = 100000;
+var sf = 10000;
 
 var planetsData = [];
 
@@ -17,18 +17,32 @@ var urls = [
 
 ]
 
-var earthCircle;
 var planetData = [];
+
+function negSqrt(num) {
+  if (num < 0) {
+    return -Math.sqrt(Math.abs(num));
+  }
+  else {
+    return Math.sqrt(num);
+  }
+}
 
 function init() {
   var stage = new createjs.Stage("demoCanvas");
+  // sun
+  sunCircle = new createjs.Shape();
+  sunCircle.graphics.beginFill("Orange").drawCircle(0, 0, 30);
+  sunCircle.x = xOffset;
+  sunCircle.y = yOffset;
+  stage.addChild(sunCircle);
   // earth
   earthCircle = new createjs.Shape();
-  earthCircle.graphics.beginFill("Crimson").drawCircle(0, 0, 10);
+  earthCircle.graphics.beginFill("Blue").drawCircle(0, 0, 10);
   stage.addChild(earthCircle);
   // mercury
   mercuryCircle = new createjs.Shape();
-  mercuryCircle.graphics.beginFill("Blue").drawCircle(0, 0, 10);
+  mercuryCircle.graphics.beginFill("Crimson").drawCircle(0, 0, 10);
   stage.addChild(mercuryCircle);
   // saturn
   saturnCircle = new createjs.Shape();
@@ -59,7 +73,7 @@ function init() {
   });
   $(function() {
     $('#slider').slider({
-      min: 1,
+      min: 1460,
       max: 7300, // days after 1996 001
       slide: function( event, ui ) {
         var days = ui.value;
@@ -67,17 +81,25 @@ function init() {
         var days = days % 365;
         $( "#currentTime" ).val( "year: " + (years + 1996) + " days: " + days );
         var earthArray = planetData[0][ui.value];
-        earthCircle.x = Math.cbrt(Number(earthArray[0]*sf)) + xOffset;
-        earthCircle.y = Math.cbrt(Number(earthArray[1]*sf)) + yOffset;
+        if (earthArray) {
+          earthCircle.x = negSqrt(Number(earthArray[0]*sf)) + xOffset;
+          earthCircle.y = negSqrt(Number(earthArray[1]*sf)) + yOffset;
+        }
         var mercuryArray = planetData[1][ui.value];
-        mercuryCircle.x = Math.cbrt(Number(mercuryArray[0]*sf)) + xOffset;
-        mercuryCircle.y = Math.cbrt(Number(mercuryArray[1]*sf)) + yOffset;
+        if (mercuryArray) {
+          mercuryCircle.x = negSqrt(Number(mercuryArray[0]*sf)) + xOffset;
+          mercuryCircle.y = negSqrt(Number(mercuryArray[1]*sf)) + yOffset;
+        }
         var saturnArray = planetData[2][ui.value];
-        saturnCircle.x = Math.cbrt(Number(saturnArray[0]*sf)) + xOffset;
-        saturnCircle.y = Math.cbrt(Number(saturnArray[1]*sf)) + yOffset;
+        if (saturnArray) {
+          saturnCircle.x = negSqrt(Number(saturnArray[0]*sf)) + xOffset;
+          saturnCircle.y = negSqrt(Number(saturnArray[1]*sf)) + yOffset;
+        }
         var jupiterArray = planetData[3][ui.value];
-        jupiterCircle.x = Math.cbrt(Number(jupiterArray[0]*sf)) + xOffset;
-        jupiterCircle.y = Math.cbrt(Number(jupiterArray[1]*sf)) + yOffset;
+        if (jupiterArray) {
+          jupiterCircle.x = negSqrt(Number(jupiterArray[0]*sf)) + xOffset;
+          jupiterCircle.y = negSqrt(Number(jupiterArray[1]*sf)) + yOffset;
+        }
       }
     });
   });
