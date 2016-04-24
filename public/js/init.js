@@ -33,26 +33,36 @@ function negSqrt(num) {
 function init() {
   var stage = new createjs.Stage("demoCanvas");
   // sun
-  sunCircle = new createjs.Shape();
-  sunCircle.graphics.beginFill("Orange").drawCircle(0, 0, 30);
+  sunImage = new Image();
+  sunImage.src = 'http://orig12.deviantart.net/c7d3/f/2013/292/7/5/sun_transparent_background_sun_world_by_royalblueiv-d6r3ze7.png';
+  sunCircle = new createjs.Bitmap(sunImage);
+  sunCircle.scaleX = sunCircle.scaleY = 0.13;
   sunCircle.x = xOffset;
   sunCircle.y = yOffset;
   stage.addChild(sunCircle);
   // earth
-  earthCircle = new createjs.Shape();
-  earthCircle.graphics.beginFill("Blue").drawCircle(0, 0, 10);
+  var earthImage = new Image();
+  earthImage.src = 'http://vignette1.wikia.nocookie.net/xenosaga/images/1/1e/Earth.png/revision/20141111161920';
+  earthCircle = new createjs.Bitmap(earthImage);
+  earthCircle.scaleX = earthCircle.scaleY = 0.10;
   stage.addChild(earthCircle);
   // mercury
-  mercuryCircle = new createjs.Shape();
-  mercuryCircle.graphics.beginFill("Crimson").drawCircle(0, 0, 10);
+  mercuryImage = new Image();
+  mercuryImage.src = 'http://1.bp.blogspot.com/-S4WaVF7emzU/Tiz2l3xYegI/AAAAAAAAALI/PC7BtFc2lEk/s1600/mercury.png'
+  mercuryCircle = new createjs.Bitmap(mercuryImage);
+  mercuryCircle.scaleX = mercuryCircle.scaleY = 0.03;
   stage.addChild(mercuryCircle);
   // saturn
-  saturnCircle = new createjs.Shape();
-  saturnCircle.graphics.beginFill("Green").drawCircle(0, 0, 10);
+  saturnImage = new Image();
+  saturnImage.src = 'http://nuvuthemes.com/extensions/wp-content/uploads/2013/09/saturn-1024x421.png';
+  saturnCircle = new createjs.Bitmap(saturnImage);
+  saturnCircle.scaleX = saturnCircle.scaleY = 0.07
   stage.addChild(saturnCircle);
   // jupiter
-  jupiterCircle = new createjs.Shape();
-  jupiterCircle.graphics.beginFill("Yellow").drawCircle(0, 0, 10);
+  jupiterImage = new Image();
+  jupiterImage.src = 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Jupiter_(transparent).png';
+  jupiterCircle = new createjs.Bitmap(jupiterImage);
+  jupiterCircle.scaleX = jupiterCircle.scaleY = 0.05;
   stage.addChild(jupiterCircle);
   createjs.Ticker.setFPS(60);
   createjs.Ticker.addEventListener("tick", stage);
