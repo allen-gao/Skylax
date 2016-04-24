@@ -71,6 +71,36 @@ app.post('/planets', function(req, res) {
   request(options, callback);
 });
 
+app.post('/helios1', function(req, res) {
+  console.log(req.body);
+
+  var options = {
+    url: 'http://omniweb.gsfc.nasa.gov/cgi/models/helios1.cgi',
+    method: 'POST',
+    formData: req.body
+  };
+  var callback = function(response1, response2) {
+    return res.send(response2);
+  }
+  request(options, callback);
+});
+
+app.post('/getdata', function(req, res) {
+
+  var options = {
+    url: req.body.url,
+    method: req.body.type,
+    //formData: req.body.params
+  };
+  var callback = function(response1, response2) {
+    return res.send({
+      response1: response1,
+      response2: response2
+    });
+  }
+  request(options, callback);
+});
+
 
 /**
  * Start Server

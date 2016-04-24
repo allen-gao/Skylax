@@ -1,60 +1,112 @@
 var minYear = 1950;
 var maxYear = 2030;
 
+var urls = [
+  'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_9034.lst', // mercury 2000 001 - 2015 365
+  'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_2988.lst', // earth 1996 001 - 2016 365
+  'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_9372.lst' // jupiter 1996 001 - 2016 365
+]
+
+var circle;
+var gotCircle;
+
 function init() {
   var stage = new createjs.Stage("demoCanvas");
-  var circle = new createjs.Shape();
-  circle.graphics.beginFill("Crimson").drawCircle(0, 0, 50);
+  circle = new createjs.Shape();
+  circle.graphics.beginFill("Crimson").drawCircle(0, 0, 10);
   circle.x = 100;
   circle.y = 100;
   stage.addChild(circle);
-  createjs.Tween.get(circle, {loop: true})
-    .to({x: 400}, 1000, createjs.Ease.getPowInOut(4))
-    .to({alpha: 0, y: 75}, 500, createjs.Ease.getPowInOut(2))
-    .to({alpha: 0, y: 125}, 100)
-    .to({alpha: 1, y: 100}, 500, createjs.Ease.getPowInOut(2))
-    .to({x: 100}, 800, createjs.Ease.getPowInOut(2));
+  gotCircle = createjs.Tween.get(circle, {loop: true});
   createjs.Ticker.setFPS(60);
   createjs.Ticker.addEventListener("tick", stage);
+
+  var results = [];
+  getAllData().done(function() {
+    for (var i = 0; i < arguments.length; i++) {
+      results.push(arguments[i][0]);
+    }
+    console.log(results);
+  });
 }
 
+function getDataRequest(url) {
+  return $.ajax({
+    type: 'POST',
+    url: '/getdata',
+    data: {
+      url: url,
+      type: 'GET'
+    }
+  });
+}
+
+function getAllData() {
+  var requestArray = [];
+  urls.forEach(function(url) {
+    requestArray.push(getDataRequest(url));
+  });
+  return $.when.apply(undefined, requestArray);
+
+  $.when.apply($, requestArray.map(function(url) {
+    return $.ajax(url);
+  }));
+}
+
+/*
 $.ajax({
   type: 'POST',
-  url: '/planets',
+  url: '/getdata', //'/planets',
   data: {
-    'activity': 'retrieve',
-    'planet': '07',
-    'coordinate': '2',
-    'resolution': '001',
-    'start_year': '1998',
-    'start_day': '001',
-    'stop_year': '1998',
-    'stop_day': '365',
+    params: {
+      'activity': 'retrieve',
+      'object': '04', //'planet': '05',
+      'resolution': '001',
+      'coordinate': '2',
+      'equinox': '3',
+      'start_year': '1996',
+      'start_day': '001',
+      'stop_year': '2016',
+      'stop_day': '365'
+    },
+    url: 'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_2988.lst',
+    type: 'GET'
   }
 }).done(function(response) {
-  console.log(parser(response.body));
-})
+  console.log(response);
+  var response = parser(response.response2.body);
+  console.log(response);
+  response.forEach(function(array) {
+    //var result = convertXY(array[2] * 100, array[3], array[4]);
+    //console.log(result);
+    gotCircle
+      .to({x: Number(array[2])*50 + 600, y: Number(array[3])*50 + 600}, 50, createjs.Ease.getPowInOut(4))
+  });
+});
+
+*/
 
 function parser(body) {
   var responseArray = [];
   var lines = body.split('\n');
+
   lines = lines.map(function(line) {
     return line.split(/[\s,]+/);
   });
   lines.forEach(function(line) {
-    if (line.length > 1 && line[0] !== 'start_year=') {
-      var num = Number(line[1]);
-      if (num !== NaN && num >= minYear && num <= maxYear) {
-        line.shift();
-        responseArray.push(line);
-      }
+    var num = Number(line[0]);
+    if (num !== NaN && num >= minYear && num <= maxYear) {
+      responseArray.push(line);
     }
   });
   return responseArray;
 }
 
-function convertXY(long, lat) {
-  var radius = 100;
+function convertXY(radius, lat, long) {
+
+  lat = lat*(180/Math.PI);
+  long = long*(180/Math.PI);
+
   var x = radius * Math.cos(lat) * Math.cos(long);
   var y = radius * Math.cos(lat) * Math.sin(long);
   return {
