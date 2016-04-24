@@ -11,6 +11,7 @@ var urls = [
 
 var circle;
 var gotCircle;
+var planetData = [];
 
 function init() {
   var stage = new createjs.Stage("demoCanvas");
@@ -24,22 +25,39 @@ function init() {
   createjs.Ticker.addEventListener("tick", stage);
 
   var results = [];
-  getAllData().done(function() {
+  getAllData().done(function(response) {
+    console.log(parser(response.earth));
+    console.log(parser(response.mercury));
+    console.log(parser(response.saturn));
+    console.log(parser(response.jupiter));
+    /*
     for (var i = 0; i < arguments.length; i++) {
       results.push(arguments[i][0]);
     }
-    console.log(results);
+    results.forEach(function(result) {
+      console.log(result);
+      console.log(parser(result.response2.body));
+    })
+    */
   });
   $(function() {
     $('#slider').slider({
-      min: 0,
-      max: 10000,
+      min: 1,
+      max: 7300, // days after 1996 001
       slide: function( event, ui ) {
-         $( "#currentTime" ).val( ui.value );
+        var days = ui.value;
+        var years = Math.floor(days / 365);
+        var days = days % 365;
+        $( "#currentTime" ).val( "year: " + (years + 1996) + " days: " + days );
       }
     });
   });
-
+  $.ajax({
+    type: 'POST',
+    url: '/allData',
+  }).done(function(response) {
+    console.log(response);
+  })
 }
 
 function getDataRequest(url) {
@@ -54,6 +72,11 @@ function getDataRequest(url) {
 }
 
 function getAllData() {
+  return $.ajax({
+    type: 'POST',
+    url: '/allData',
+  });
+/*
   var requestArray = [];
   urls.forEach(function(url) {
     requestArray.push(getDataRequest(url));
@@ -63,6 +86,7 @@ function getAllData() {
   $.when.apply($, requestArray.map(function(url) {
     return $.ajax(url);
   }));
+  */
 }
 
 /*
@@ -101,16 +125,18 @@ $.ajax({
 function parser(body) {
   var responseArray = [];
   var lines = body.split('\n');
-
   lines = lines.map(function(line) {
+    //console.log(line.split(/[\s,]+/));
     return line.split(/[\s,]+/);
   });
   lines.forEach(function(line) {
-    var num = Number(line[0]);
+    var num = Number(line[1]);
     if (num !== NaN && num >= minYear && num <= maxYear) {
+      line.shift();
       responseArray.push(line);
     }
   });
+  //console.dir(lines);
   return responseArray;
 }
 
