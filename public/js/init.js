@@ -1,6 +1,14 @@
 var minYear = 1950;
 var maxYear = 2030;
 
+var xOffset = 400;
+var yOffset = 400;
+
+var sf = 100;
+
+var planetsData = [];
+
+
 var urls = [
   'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_9034.lst', // mercury 2000 001 - 2015 365
   'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_2988.lst', // earth 1996 001 - 2016 365
@@ -9,27 +17,24 @@ var urls = [
 
 ]
 
-var circle;
-var gotCircle;
+var earthCircle;
 var planetData = [];
 
 function init() {
   var stage = new createjs.Stage("demoCanvas");
-  circle = new createjs.Shape();
-  circle.graphics.beginFill("Crimson").drawCircle(0, 0, 10);
-  circle.x = 100;
-  circle.y = 100;
-  stage.addChild(circle);
-  gotCircle = createjs.Tween.get(circle, {loop: true});
+  earthCircle = new createjs.Shape();
+  earthCircle.graphics.beginFill("Crimson").drawCircle(0, 0, 10);
+
+  stage.addChild(earthCircle);
   createjs.Ticker.setFPS(60);
   createjs.Ticker.addEventListener("tick", stage);
 
   var results = [];
   getAllData().done(function(response) {
-    console.log(parser(response.earth));
-    console.log(parser(response.mercury));
-    console.log(parser(response.saturn));
-    console.log(parser(response.jupiter));
+    planetData.push(parser(response.earth));
+    planetData.push(parser(response.mercury));
+    planetData.push(parser(response.saturn));
+    planetData.push(parser(response.jupiter));
     /*
     for (var i = 0; i < arguments.length; i++) {
       results.push(arguments[i][0]);
@@ -49,6 +54,9 @@ function init() {
         var years = Math.floor(days / 365);
         var days = days % 365;
         $( "#currentTime" ).val( "year: " + (years + 1996) + " days: " + days );
+        var coordinateArray = planetData[0][ui.value];
+        earthCircle.x = Number(coordinateArray[0]*sf) + xOffset;
+        earthCircle.y = Number(coordinateArray[1]*sf) + yOffset;
       }
     });
   });
@@ -123,7 +131,7 @@ $.ajax({
 */
 
 function parser(body) {
-  var responseArray = [];
+  var responseObject = {};
   var lines = body.split('\n');
   lines = lines.map(function(line) {
     //console.log(line.split(/[\s,]+/));
@@ -132,12 +140,14 @@ function parser(body) {
   lines.forEach(function(line) {
     var num = Number(line[1]);
     if (num !== NaN && num >= minYear && num <= maxYear) {
-      line.shift();
-      responseArray.push(line);
+      var timeNum = (Number(line[1]) - 1996)*365 + Number(line[2]);
+      line.splice(0, 3);
+      responseObject[timeNum] = line;
+      //console.log(timeNum);
     }
   });
-  //console.dir(lines);
-  return responseArray;
+  //console.dir(responseObject);
+  return responseObject;
 }
 
 function convertXY(radius, lat, long) {
