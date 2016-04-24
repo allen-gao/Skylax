@@ -4,3 +4,7 @@
 #demoCanvas {
   background-color: black;
 }
+
+#slider {
+  width: 1000px;
+}

@@ -4,7 +4,9 @@ var maxYear = 2030;
 var urls = [
   'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_9034.lst', // mercury 2000 001 - 2015 365
   'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_2988.lst', // earth 1996 001 - 2016 365
-  'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_9372.lst' // jupiter 1996 001 - 2016 365
+  'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_9372.lst', // jupiter 1996 001 - 2016 365
+  'http://omniweb.gsfc.nasa.gov/staging/modelweb/helios_10131.lst' // saturn 1996 001 - 2016 365
+
 ]
 
 var circle;
@@ -28,6 +30,16 @@ function init() {
     }
     console.log(results);
   });
+  $(function() {
+    $('#slider').slider({
+      min: 0,
+      max: 10000,
+      slide: function( event, ui ) {
+         $( "#currentTime" ).val( ui.value );
+      }
+    });
+  });
+
 }
 
 function getDataRequest(url) {
