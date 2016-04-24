@@ -4,7 +4,7 @@ var maxYear = 2030;
 var xOffset = 400;
 var yOffset = 400;
 
-var sf = 100;
+var sf = 100000;
 
 var planetsData = [];
 
@@ -22,10 +22,22 @@ var planetData = [];
 
 function init() {
   var stage = new createjs.Stage("demoCanvas");
+  // earth
   earthCircle = new createjs.Shape();
   earthCircle.graphics.beginFill("Crimson").drawCircle(0, 0, 10);
-
   stage.addChild(earthCircle);
+  // mercury
+  mercuryCircle = new createjs.Shape();
+  mercuryCircle.graphics.beginFill("Blue").drawCircle(0, 0, 10);
+  stage.addChild(mercuryCircle);
+  // saturn
+  saturnCircle = new createjs.Shape();
+  saturnCircle.graphics.beginFill("Green").drawCircle(0, 0, 10);
+  stage.addChild(saturnCircle);
+  // jupiter
+  jupiterCircle = new createjs.Shape();
+  jupiterCircle.graphics.beginFill("Yellow").drawCircle(0, 0, 10);
+  stage.addChild(jupiterCircle);
   createjs.Ticker.setFPS(60);
   createjs.Ticker.addEventListener("tick", stage);
 
@@ -54,9 +66,18 @@ function init() {
         var years = Math.floor(days / 365);
         var days = days % 365;
         $( "#currentTime" ).val( "year: " + (years + 1996) + " days: " + days );
-        var coordinateArray = planetData[0][ui.value];
-        earthCircle.x = Number(coordinateArray[0]*sf) + xOffset;
-        earthCircle.y = Number(coordinateArray[1]*sf) + yOffset;
+        var earthArray = planetData[0][ui.value];
+        earthCircle.x = Math.cbrt(Number(earthArray[0]*sf)) + xOffset;
+        earthCircle.y = Math.cbrt(Number(earthArray[1]*sf)) + yOffset;
+        var mercuryArray = planetData[1][ui.value];
+        mercuryCircle.x = Math.cbrt(Number(mercuryArray[0]*sf)) + xOffset;
+        mercuryCircle.y = Math.cbrt(Number(mercuryArray[1]*sf)) + yOffset;
+        var saturnArray = planetData[2][ui.value];
+        saturnCircle.x = Math.cbrt(Number(saturnArray[0]*sf)) + xOffset;
+        saturnCircle.y = Math.cbrt(Number(saturnArray[1]*sf)) + yOffset;
+        var jupiterArray = planetData[3][ui.value];
+        jupiterCircle.x = Math.cbrt(Number(jupiterArray[0]*sf)) + xOffset;
+        jupiterCircle.y = Math.cbrt(Number(jupiterArray[1]*sf)) + yOffset;
       }
     });
   });
